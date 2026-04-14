@@ -1,0 +1,9 @@
+name = "trendkart-backend"
+main = "src/index.js"
+compatibility_date = "2024-02-15"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Environment variables will be set here or via dashboard
+# FIREBASE_PROJECT_ID = "trendkart-53484"
+# CLOUDINARY_CLOUD_NAME = "df7bzlvfb"

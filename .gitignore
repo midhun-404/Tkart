@@ -1,8 +1,9 @@
 
 # Dependencies
 node_modules/
-client/node_modules/
-server/node_modules/
+apps/web/node_modules/
+apps/api/node_modules/
+apps/worker/node_modules/
 
 # Environment Variables
 .env
@@ -12,11 +13,11 @@ server/node_modules/
 .env.production.local
 
 # Firebase Admin Service Account Key (CRITICAL)
-server/src/config/serviceAccountKey.json
+apps/api/src/config/serviceAccountKey.json
 
 # Builds
 dist/
-client/dist/
+apps/web/dist/
 build/
 coverage/
 
