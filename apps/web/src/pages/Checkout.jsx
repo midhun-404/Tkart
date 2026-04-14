@@ -85,12 +85,22 @@ const Checkout = () => {
         loadSavedAddress();
 
         // Pre-load Razorpay SDK
-        if (window.Razorpay) { setSdkReady(true); return; }
-        const script = document.createElement('script');
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-        script.onload = () => setSdkReady(true);
-        script.onerror = () => setSdkReady(false);
-        document.body.appendChild(script);
+        if (window.Razorpay) {
+            setSdkReady(true);
+        } else {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.async = true;
+            script.onload = () => {
+                console.log('Razorpay SDK Loaded');
+                setSdkReady(true);
+            };
+            script.onerror = () => {
+                console.error('Razorpay SDK Load Error');
+                setSdkReady(false);
+            };
+            document.body.appendChild(script);
+        }
     }, [user]);
 
     const handleChange = (e) => {
@@ -159,12 +169,13 @@ const Checkout = () => {
                 }
 
                 const orderRes = await api.post('/payment/create-order', { amount: finalTotal });
-                const keyId = 'rzp_test_S8X93NUrtx5Pm3';
-                const { id: order_id, amount, currency } = orderRes.data;
+                const { id: order_id, amount, currency, key: backendKey } = orderRes.data;
+
                 if (!order_id) throw new Error('Backend failed to return Order ID');
+                if (!backendKey) console.warn('Backend did not return Razorpay Key, falling back...');
 
                 const options = {
-                    key: keyId,
+                    key: backendKey || 'rzp_test_SM2anoSsmV2XDw', // Use backend key, fallback to new test key
                     amount,
                     currency,
                     name: 'TrendKart',
