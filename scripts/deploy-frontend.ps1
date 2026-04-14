@@ -1,5 +1,15 @@
-$env:CLOUDFLARE_ACCOUNT_ID = "441473cfd291e56f372ff4b4640ee88d"
-$env:CLOUDFLARE_API_TOKEN = "dBh8-LGrxeQGnPSd5Tb01zmG6rtKOlSQYTnXpQlo"
+function Load-Env {
+    if (Test-Path ".env") {
+        Get-Content ".env" | ForEach-Object {
+            if ($_ -match '^(?<key>[^=]+)=(?<value>.*)$') {
+                $key = $Matches.key.Trim()
+                $value = $Matches.value.Trim()
+                $env:$key = $value
+            }
+        }
+    }
+}
+Load-Env
 
 Write-Host "--- Cloudflare Frontend Deployment Script ---"
 

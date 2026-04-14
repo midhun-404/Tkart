@@ -1,5 +1,15 @@
-$env:CLOUDFLARE_ACCOUNT_ID = "441473cfd291e56f372ff4b4640ee88d"
-$env:CLOUDFLARE_API_TOKEN = "dBh8-LGrxeQGnPSd5Tb01zmG6rtKOlSQYTnXpQlo"
+function Load-Env {
+    if (Test-Path ".env") {
+        Get-Content ".env" | ForEach-Object {
+            if ($_ -match '^(?<key>[^=]+)=(?<value>.*)$') {
+                $key = $Matches.key.Trim()
+                $value = $Matches.value.Trim()
+                $env:$key = $value
+            }
+        }
+    }
+}
+Load-Env
 
 Write-Host "--- Cloudflare Worker Deployment Script ---"
 
@@ -21,7 +31,11 @@ Write-Host "Configuring Secrets..."
 
 # Helper function to set secret
 function Set-WorkerSecret ($key, $value) {
-    Write-Output $value | npx wrangler secret put $key
+    if ($value) {
+        Write-Output $value | npx wrangler secret put $key
+    } else {
+        Write-Host "Warning: Secret $key is not set in environment." -ForegroundColor Yellow
+    }
 }
 
 # Firebase (Read file content)
@@ -30,19 +44,19 @@ $firebaseKey = Get-Content "../../apps/api/src/config/serviceAccountKey.json" -R
 Write-Output $firebaseKey | npx wrangler secret put FIREBASE_SERVICE_ACCOUNT
 
 # Cloudinary
-Set-WorkerSecret "CLOUDINARY_CLOUD_NAME" "df7bzlvfb"
-Set-WorkerSecret "CLOUDINARY_API_KEY" "854124388467913"
-Set-WorkerSecret "CLOUDINARY_API_SECRET" "p046tBDjtegMS5P-IFPdTx_ZXMU"
+Set-WorkerSecret "CLOUDINARY_CLOUD_NAME" $env:CLOUDINARY_CLOUD_NAME
+Set-WorkerSecret "CLOUDINARY_API_KEY" $env:CLOUDINARY_API_KEY
+Set-WorkerSecret "CLOUDINARY_API_SECRET" $env:CLOUDINARY_API_SECRET
 
 # Razorpay
-Set-WorkerSecret "RAZORPAY_KEY_ID" "rzp_test_S8X93NUrtx5Pm3"
-Set-WorkerSecret "RAZORPAY_KEY_SECRET" "1AswCsLr08PGbb506gnmvoJz"
+Set-WorkerSecret "RAZORPAY_KEY_ID" $env:RAZORPAY_KEY_ID
+Set-WorkerSecret "RAZORPAY_KEY_SECRET" $env:RAZORPAY_KEY_SECRET
 
 # JWT
-Set-WorkerSecret "JWT_SECRET" "supersecretkey_change_this_in_production"
+Set-WorkerSecret "JWT_SECRET" $env:JWT_SECRET
 
 # Firebase Project ID (if used)
-Set-WorkerSecret "FIREBASE_PROJECT_ID" "trendkart-53484"
+Set-WorkerSecret "FIREBASE_PROJECT_ID" $env:FIREBASE_PROJECT_ID
 
 Write-Host "--- Deployment Complete! ---"
 Read-Host -Prompt "Press Enter to exit"

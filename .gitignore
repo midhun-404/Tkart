@@ -35,3 +35,6 @@ Thumbs.db
 # Other
 .vscode/
 .idea/
+
+# Deployment Secrets
+scripts/.env
